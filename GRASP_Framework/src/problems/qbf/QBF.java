@@ -41,11 +41,6 @@ public class QBF implements Evaluator<Integer> {
 	public Double[][] A;
 
 	/**
-	 * The list T of prohibited tuples
-	 */
-	public Integer[][] prohibited_triples;
-	
-	/**
 	 * The constructor for QuadracticBinaryFunction class. The filename of the
 	 * input for setting matrix of coefficients A of the QBF. The dimension of
 	 * the array of variables x is returned from the {@link #readInput} method.
@@ -58,48 +53,8 @@ public class QBF implements Evaluator<Integer> {
 	public QBF(String filename) throws IOException {
 		size = readInput(filename);
 		variables = allocateVariables();
-		prohibited_triples = mountProhibitedList();
 	}
 
-	
-	public Integer[][] mountProhibitedList() {
-		Integer[][] triples = new Integer[size][3];
-		for (int i = 0; i < size; i++) {
-			triples[i][0] = i+1;
-			
-			if (lFunction(i, 131, 1031) != i+1) {
-				triples[i][1] = lFunction(i, 131, 1031);
-			} else {
-				triples[i][1] = 1 + (lFunction(i, 131, 1031) % size);
-			}
-			
-			Integer x = 1 + (lFunction(i, 193, 1093) % size);
-			if (lFunction(i, 193, 1093) != i+1 && lFunction(i, 193, 1093) != triples[i][1]) {
-				triples[i][2] = lFunction(i, 193, 1093);
-			} else if (x != i+1 && x != triples[i][1]) {
-				triples[i][2] = x;
-			} else {
-				triples[i][2] = 1 + ((lFunction(i, 193, 1093) + 1) % size);
-			}
-			Integer maxi = Math.max(triples[i][0], Math.max(triples[i][1], triples[i][2]));
-			Integer mini = Math.min(triples[i][0], Math.min(triples[i][1], triples[i][2]));
-			Integer middle = triples[i][0] + triples[i][1] + triples[i][2] - maxi - mini;
-			triples[i][0] = mini;
-			triples[i][1] = middle;
-			triples[i][2] = maxi;
-		}
-		return triples;
-	}
-	
-	public void printProhibitedList() {
-		for (int i = 0; i < size; i++) {
-			System.out.println(prohibited_triples[i][0] + " " + prohibited_triples[i][1] + " " +  prohibited_triples[i][2]);
-		}
-	}
-	
-	private Integer lFunction(Integer u, Integer pi_1, Integer pi_2) {
-		return 1 + ((pi_1 * u + pi_2) % size);
-	}
 	/**
 	 * Evaluates the value of a solution by transforming it into a vector. This
 	 * is required to perform the matrix multiplication which defines a QBF.
@@ -379,9 +334,8 @@ public class QBF implements Evaluator<Integer> {
 	 */
 	public static void main(String[] args) throws IOException {
 
-		QBF qbf = new QBF("instances/qbf020");
+		QBF qbf = new QBF("matrix40");
 		qbf.printMatrix();
-		qbf.printProhibitedList();
 		Double maxVal = Double.NEGATIVE_INFINITY;
 
 		// evaluates randomly generated values for the domain, saving the best
@@ -393,9 +347,9 @@ public class QBF implements Evaluator<Integer> {
 				else
 					qbf.variables[j] = 1.0;
 			}
-			//System.out.println("x = " + Arrays.toString(qbf.variables));
+			System.out.println("x = " + Arrays.toString(qbf.variables));
 			Double eval = qbf.evaluateQBF();
-			//System.out.println("f(x) = " + eval);
+			System.out.println("f(x) = " + eval);
 			if (maxVal < eval)
 				maxVal = eval;
 		}
