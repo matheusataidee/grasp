@@ -35,7 +35,7 @@ public class GRASP_QBF extends AbstractGRASP<Integer> {
 	 *             necessary for I/O operations.
 	 */
 	public GRASP_QBF(Double alpha, Integer iterations, String filename) throws IOException {
-		super(new QBF_Inverse(filename), alpha, iterations);
+		super(new QBF_Inverse(filename), alpha, iterations, false);
 	}
 
 	/*
@@ -103,7 +103,7 @@ public class GRASP_QBF extends AbstractGRASP<Integer> {
 	 * composed by the neighborhood moves Insertion, Removal and 2-Exchange.
 	 */
 	@Override
-	public Solution<Integer> localSearch() {
+	public Solution<Integer> localSearch(boolean allowInsertions) {
 
 		Double minDeltaCost;
 		Integer bestCandIn = null, bestCandOut = null;

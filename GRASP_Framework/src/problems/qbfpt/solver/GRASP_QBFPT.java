@@ -37,8 +37,8 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 	 * @throws IOException
 	 *             necessary for I/O operations.
 	 */
-	public GRASP_QBFPT(Double alpha, Integer iterations, String filename, boolean firstImproving) throws IOException {
-		super(new QBFPT_Inverse(filename), alpha, iterations);
+	public GRASP_QBFPT(Double alpha, Integer iterations, String filename, boolean firstImproving, boolean pop) throws IOException {
+		super(new QBFPT_Inverse(filename), alpha, iterations, pop);
 		this.firstImproving = firstImproving;
 	}
 
@@ -107,7 +107,7 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 	 * composed by the neighborhood moves Insertion, Removal and 2-Exchange.
 	 */
 	@Override
-	public Solution<Integer> localSearch() {
+	public Solution<Integer> localSearch(boolean allowInsertions) {
 
 		Double minDeltaCost;
 		Integer bestCandIn = null, bestCandOut = null;
@@ -127,14 +127,17 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 			{
 				if (type == 0)
 				{
-					// Evaluate insertions
-					for (Integer candIn : CL) {
-						double deltaCost = ObjFunction.evaluateInsertionCost(candIn, incumbentSol);
-						if (deltaCost < minDeltaCost) {
-							minDeltaCost = deltaCost;
-							bestCandIn = candIn;
-							bestCandOut = null;
-						}
+					if (allowInsertions)
+					{
+						// Evaluate insertions
+						for (Integer candIn : CL) {
+							double deltaCost = ObjFunction.evaluateInsertionCost(candIn, incumbentSol);
+							if (deltaCost < minDeltaCost) {
+								minDeltaCost = deltaCost;
+								bestCandIn = candIn;
+								bestCandOut = null;
+							}
+						}						
 					}
 				}
 				else if (type == 1)
@@ -195,7 +198,7 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 	public static void main(String[] args) throws IOException {
 
 		long startTime = System.currentTimeMillis();
-		GRASP_QBFPT grasp = new GRASP_QBFPT(0.05, 1000, "instances/qbf020", true);
+		GRASP_QBFPT grasp = new GRASP_QBFPT(0.05, 1000, "instances/qbf060", true, true);
 		Solution<Integer> bestSol = grasp.solve();
 		System.out.println("maxVal = " + bestSol);
 		long endTime   = System.currentTimeMillis();

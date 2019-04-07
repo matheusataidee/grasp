@@ -76,6 +76,8 @@ public abstract class AbstractGRASP<E> {
 	 */
 	protected ArrayList<E> RCL;
 
+	protected boolean pop = false;
+
 	/**
 	 * Creates the Candidate List, which is an ArrayList of candidate elements
 	 * that can enter a solution.
@@ -116,7 +118,7 @@ public abstract class AbstractGRASP<E> {
 	 * 
 	 * @return An local optimum solution.
 	 */
-	public abstract Solution<E> localSearch();
+	public abstract Solution<E> localSearch(boolean allowInsertions);
 
 	/**
 	 * Constructor for the AbstractGRASP class.
@@ -129,10 +131,11 @@ public abstract class AbstractGRASP<E> {
 	 * @param iterations
 	 *            The number of iterations which the GRASP will be executed.
 	 */
-	public AbstractGRASP(Evaluator<E> objFunction, Double alpha, Integer iterations) {
+	public AbstractGRASP(Evaluator<E> objFunction, Double alpha, Integer iterations, boolean pop) {
 		this.ObjFunction = objFunction;
 		this.alpha = alpha;
 		this.iterations = iterations;
+		this.pop = pop;
 	}
 	
 	/**
@@ -149,8 +152,24 @@ public abstract class AbstractGRASP<E> {
 		incumbentSol = createEmptySol();
 		incumbentCost = Double.POSITIVE_INFINITY;
 
+		int numSteps = 0;
+		
 		/* Main loop, which repeats until the stopping criteria is reached. */
 		while (!constructiveStopCriteria()) {
+
+			incumbentCost = ObjFunction.evaluate(incumbentSol);
+			updateCL();
+
+			if (pop && (numSteps == (int)(0.2 * this.ObjFunction.getDomainSize())
+				|| numSteps == (int)(0.4 * this.ObjFunction.getDomainSize())
+				|| numSteps == (int)(0.6 * this.ObjFunction.getDomainSize())
+				|| numSteps == (int)(0.8 * this.ObjFunction.getDomainSize())))
+			{
+				// POP: at certain milestones do local search, but limiting solution size to current.
+				this.localSearch(false);
+			}
+
+			numSteps++;
 
 			double maxCost = Double.NEGATIVE_INFINITY, minCost = Double.POSITIVE_INFINITY;
 			incumbentCost = ObjFunction.evaluate(incumbentSol);
@@ -209,7 +228,7 @@ public abstract class AbstractGRASP<E> {
 		bestSol = createEmptySol();
 		for (int i = 0; i < iterations; i++) {
 			constructiveHeuristic();
-			localSearch();
+			localSearch(true);
 			if (bestSol.cost > incumbentSol.cost) {
 				bestSol = new Solution<E>(incumbentSol);
 				if (verbose)
