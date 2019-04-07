@@ -2,6 +2,7 @@ package problems.qbfpt.solver;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import metaheuristics.grasp.AbstractGRASP;
 import problems.qbfpt.QBFPT_Inverse;
@@ -19,6 +20,8 @@ import solutions.Solution;
  */
 public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 
+	boolean firstImproving;
+	
 	/**
 	 * Constructor for the GRASP_QBF class. An inverse QBF objective function is
 	 * passed as argument for the superclass constructor.
@@ -34,8 +37,9 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 	 * @throws IOException
 	 *             necessary for I/O operations.
 	 */
-	public GRASP_QBFPT(Double alpha, Integer iterations, String filename) throws IOException {
+	public GRASP_QBFPT(Double alpha, Integer iterations, String filename, boolean firstImproving) throws IOException {
 		super(new QBFPT_Inverse(filename), alpha, iterations);
+		this.firstImproving = firstImproving;
 	}
 
 	/*
@@ -111,36 +115,62 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 		do {
 			minDeltaCost = Double.POSITIVE_INFINITY;
 			updateCL();
-				
-			// Evaluate insertions
-			for (Integer candIn : CL) {
-				double deltaCost = ObjFunction.evaluateInsertionCost(candIn, incumbentSol);
-				if (deltaCost < minDeltaCost) {
-					minDeltaCost = deltaCost;
-					bestCandIn = candIn;
-					bestCandOut = null;
-				}
-			}
-			// Evaluate removals
-			for (Integer candOut : incumbentSol) {
-				double deltaCost = ObjFunction.evaluateRemovalCost(candOut, incumbentSol);
-				if (deltaCost < minDeltaCost) {
-					minDeltaCost = deltaCost;
-					bestCandIn = null;
-					bestCandOut = candOut;
-				}
-			}
-			// Evaluate exchanges
-			for (Integer candIn : CL) {
-				for (Integer candOut : incumbentSol) {
-					double deltaCost = ObjFunction.evaluateExchangeCost(candIn, candOut, incumbentSol);
-					if (deltaCost < minDeltaCost) {
-						minDeltaCost = deltaCost;
-						bestCandIn = candIn;
-						bestCandOut = candOut;
+			
+			ArrayList<Integer> typeOrder = new ArrayList<Integer>();
+			typeOrder.add(0); typeOrder.add(1); typeOrder.add(2);
+			
+			Collections.shuffle(typeOrder);
+			Collections.shuffle(CL);
+			Collections.shuffle(incumbentSol);
+			
+			for (int type : typeOrder)
+			{
+				if (type == 0)
+				{
+					// Evaluate insertions
+					for (Integer candIn : CL) {
+						double deltaCost = ObjFunction.evaluateInsertionCost(candIn, incumbentSol);
+						if (deltaCost < minDeltaCost) {
+							minDeltaCost = deltaCost;
+							bestCandIn = candIn;
+							bestCandOut = null;
+						}
 					}
 				}
+				else if (type == 1)
+				{
+					// Evaluate removals
+					for (Integer candOut : incumbentSol) {
+						double deltaCost = ObjFunction.evaluateRemovalCost(candOut, incumbentSol);
+						if (deltaCost < minDeltaCost) {
+							minDeltaCost = deltaCost;
+							bestCandIn = null;
+							bestCandOut = candOut;
+						}
+					}					
+				}
+				else
+				{
+					// Evaluate exchanges
+					for (Integer candIn : CL) {
+						for (Integer candOut : incumbentSol) {
+							double deltaCost = ObjFunction.evaluateExchangeCost(candIn, candOut, incumbentSol);
+							if (deltaCost < minDeltaCost) {
+								minDeltaCost = deltaCost;
+								bestCandIn = candIn;
+								bestCandOut = candOut;
+							}
+						}
+					}	
+				}
+				
+				// If in first improving mode and found an option reducing cost, stop searching.
+				if (this.firstImproving && minDeltaCost < -Double.MIN_VALUE)
+				{
+					break;
+				}
 			}
+			
 			// Implement the best move, if it reduces the solution cost.
 			if (minDeltaCost < -Double.MIN_VALUE) {
 				if (bestCandOut != null) {
@@ -165,7 +195,7 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 	public static void main(String[] args) throws IOException {
 
 		long startTime = System.currentTimeMillis();
-		GRASP_QBFPT grasp = new GRASP_QBFPT(0.05, 1000, "instances/qbf020");
+		GRASP_QBFPT grasp = new GRASP_QBFPT(0.05, 1000, "instances/qbf020", true);
 		Solution<Integer> bestSol = grasp.solve();
 		System.out.println("maxVal = " + bestSol);
 		long endTime   = System.currentTimeMillis();

@@ -3,6 +3,7 @@
  */
 package metaheuristics.grasp;
 
+import java.io.Console;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -177,10 +178,14 @@ public abstract class AbstractGRASP<E> {
 					RCL.add(c);
 				}
 			}
-
+			
+			if (RCL.size() == 0)
+				break;
+			
 			/* Choose a candidate randomly from the RCL */
 			int rndIndex = rng.nextInt(RCL.size());
 			E inCand = RCL.get(rndIndex);
+			
 			CL.remove(inCand);
 			incumbentSol.add(inCand);
 			ObjFunction.evaluate(incumbentSol);
@@ -188,6 +193,7 @@ public abstract class AbstractGRASP<E> {
 
 		}
 
+		incumbentCost = ObjFunction.evaluate(incumbentSol);
 		return incumbentSol;
 	}
 
