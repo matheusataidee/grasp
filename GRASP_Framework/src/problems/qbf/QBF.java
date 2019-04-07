@@ -23,7 +23,7 @@ import solutions.Solution;
  * @author ccavellucci, fusberti
  *
  */
-public class QBF implements Evaluator<Integer> {
+public class QBF extends Evaluator<Integer> {
 
 	/**
 	 * Dimension of the domain.
