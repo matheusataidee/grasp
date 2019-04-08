@@ -21,6 +21,7 @@ import solutions.Solution;
  */
 public abstract class AbstractGRASP<E> {
 
+	public double bestConstructiveHeuristicCost = Double.MAX_VALUE;
 	/**
 	 * flag that indicates whether the code should print more information on
 	 * screen
@@ -256,6 +257,7 @@ public abstract class AbstractGRASP<E> {
 		}
 
 		incumbentCost = ObjFunction.evaluate(incumbentSol);
+		this.bestConstructiveHeuristicCost = Math.min(this.bestConstructiveHeuristicCost, incumbentCost);
 		return incumbentSol;
 	}
 

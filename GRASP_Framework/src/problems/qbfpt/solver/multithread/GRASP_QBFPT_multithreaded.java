@@ -26,7 +26,7 @@ public class GRASP_QBFPT_multithreaded  extends GRASP_QBFPT implements Runnable{
 		}
 	}
 	public void displaySolution() {
-		System.out.println("maxVal = " + bestSol);
+		System.out.println("maxVal = " + bestSol + "\nminHeuristic = " + this.bestConstructiveHeuristicCost);
 		System.out.println("Time = "+(double)totalTime/(double)1000+" seg");
 	}
 	public static void main(String args[]) throws IOException {
@@ -58,7 +58,7 @@ public class GRASP_QBFPT_multithreaded  extends GRASP_QBFPT implements Runnable{
 			graspPolyBiasThread.start();
 			
 			try {
-				TimeUnit.MILLISECONDS.sleep(maxIter);
+				TimeUnit.MILLISECONDS.sleep((int)(maxIter * 1.1));
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
