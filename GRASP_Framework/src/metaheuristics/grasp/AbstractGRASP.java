@@ -269,13 +269,14 @@ public abstract class AbstractGRASP<E> {
 	public Solution<E> solve() {
 
 		bestSol = createEmptySol();
-		for (int i = 0; i < iterations; i++) {
+		long startTime = System.currentTimeMillis();
+		while(System.currentTimeMillis() - startTime <= iterations) {
 			constructiveHeuristic();
 			localSearch(true);
 			if (bestSol.cost > incumbentSol.cost) {
 				bestSol = new Solution<E>(incumbentSol);
 				if (verbose)
-					System.out.println("(Iter. " + i + ") BestSol = " + bestSol);
+					System.out.println("(Iter. " + ((double)(System.currentTimeMillis() - startTime)/(double)1000)  + ") BestSol = " + bestSol);
 			}
 		}
 
