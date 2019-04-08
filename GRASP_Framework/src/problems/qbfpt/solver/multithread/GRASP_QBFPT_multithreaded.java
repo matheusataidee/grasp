@@ -32,16 +32,16 @@ public class GRASP_QBFPT_multithreaded  extends GRASP_QBFPT implements Runnable{
 	public static void main(String args[]) throws IOException {
 		String instances[] = {"instances/qbf020","instances/qbf040","instances/qbf060","instances/qbf080","instances/qbf100","instances/qbf200","instances/qbf400"};
 		GRASP_QBFPT_multithreaded.verbose = false;
-		int maxIter = 5000;
-		for(int i = 0;i<6;i++) {
+		int maxIter = 50000;
+		for(int i = 4;i<5;i++) {
 			System.out.println("Instancia: "+instances[i]);
 			
-			GRASP_QBFPT_multithreaded graspPadrao = new GRASP_QBFPT_multithreaded(0.15, maxIter, instances[i], true, false, 0, 0);
-			GRASP_QBFPT_multithreaded graspDiffAlpha = new GRASP_QBFPT_multithreaded(0.05, maxIter, instances[i], true, false, 0, 0);
-			GRASP_QBFPT_multithreaded graspBestImprov = new GRASP_QBFPT_multithreaded(0.15, maxIter, instances[i], false, false, 0, 0);
-			GRASP_QBFPT_multithreaded graspPop = new GRASP_QBFPT_multithreaded(0.15, maxIter, instances[i], true, true, 0, 0);
-			GRASP_QBFPT_multithreaded graspExpBias = new GRASP_QBFPT_multithreaded(0.15, maxIter, instances[i], true, false, 1, 0);
-			GRASP_QBFPT_multithreaded graspPolyBias = new GRASP_QBFPT_multithreaded(0.15, maxIter, instances[i], true, false, 0, -1);
+			GRASP_QBFPT_multithreaded graspPadrao = new GRASP_QBFPT_multithreaded(0.05, maxIter, instances[i], true, false, 0, 0);
+			GRASP_QBFPT_multithreaded graspDiffAlpha = new GRASP_QBFPT_multithreaded(0.15, maxIter, instances[i], true, false, 0, 0);
+			GRASP_QBFPT_multithreaded graspBestImprov = new GRASP_QBFPT_multithreaded(0.05, maxIter, instances[i], false, false, 0, 0);
+			GRASP_QBFPT_multithreaded graspPop = new GRASP_QBFPT_multithreaded(0.05, maxIter, instances[i], true, true, 0, 0);
+			GRASP_QBFPT_multithreaded graspExpBias = new GRASP_QBFPT_multithreaded(0.05, maxIter, instances[i], true, false, 1, 0);
+			GRASP_QBFPT_multithreaded graspPolyBias = new GRASP_QBFPT_multithreaded(0.05, maxIter, instances[i], true, false, 0, -0.5);
 			
 			Thread graspPadraoThread = new Thread(graspPadrao);
 			Thread graspDiffAlphaThread = new Thread(graspDiffAlpha);
