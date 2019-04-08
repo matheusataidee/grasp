@@ -35,7 +35,7 @@ public abstract class AbstractGRASP<E> {
 	/**
 	 * Bias exponent for polynomial bias. Set to 0 for random bias. Must not be positive.
 	 */
-	public int biasExponent = 0;
+	public double biasExponent = 0;
 
 	/**
 	 * a random number generator
