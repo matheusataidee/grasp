@@ -37,9 +37,11 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 	 * @throws IOException
 	 *             necessary for I/O operations.
 	 */
-	public GRASP_QBFPT(Double alpha, Integer iterations, String filename, boolean firstImproving, boolean pop) throws IOException {
+	public GRASP_QBFPT(Double alpha, Integer iterations, String filename, boolean firstImproving, boolean pop, int biasType, int biasExponent) throws IOException {
 		super(new QBFPT_Inverse(filename), alpha, iterations, pop);
 		this.firstImproving = firstImproving;
+		this.biasType = biasType;
+		this.biasExponent = biasExponent;
 	}
 
 	/*
@@ -198,7 +200,7 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 	public static void main(String[] args) throws IOException {
 
 		long startTime = System.currentTimeMillis();
-		GRASP_QBFPT grasp = new GRASP_QBFPT(0.05, 1000, "instances/qbf060", true, true);
+		GRASP_QBFPT grasp = new GRASP_QBFPT(0.05, 100, "instances/qbf100", false, false, 0, -1);
 		Solution<Integer> bestSol = grasp.solve();
 		System.out.println("maxVal = " + bestSol);
 		long endTime   = System.currentTimeMillis();

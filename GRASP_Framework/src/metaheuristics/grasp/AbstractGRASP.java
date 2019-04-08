@@ -5,6 +5,7 @@ package metaheuristics.grasp;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Random;
 
 import problems.Evaluator;
@@ -25,8 +26,17 @@ public abstract class AbstractGRASP<E> {
 	 * screen
 	 */
 	public static boolean verbose = true;
+	
+	/**
+	 * Bias type, 0 for polynomial 1 for exponential.
+	 */
 	public int biasType = 0;
+	
+	/**
+	 * Bias exponent for polynomial bias. Set to 0 for random bias. Must not be positive.
+	 */
 	public int biasExponent = 0;
+
 	/**
 	 * a random number generator
 	 */
@@ -139,7 +149,8 @@ public abstract class AbstractGRASP<E> {
 	}
 	
 	public Double biasFunction(Double value) {
-		if(this.biasType == 1) return Math.pow(Math.E,value);
+		assert(this.biasExponent <= 0);
+		if(this.biasType == 1) return Math.pow(Math.E,-value);
 		return Math.pow(value, this.biasExponent);
 	}
 	
@@ -197,24 +208,42 @@ public abstract class AbstractGRASP<E> {
 			 * Among all candidates, insert into the RCL those with the highest
 			 * performance using parameter alpha as threshold.
 			 */
+			RCL.clear();
 			ArrayList<Double> cumSum = new ArrayList<Double>();
+			ArrayList<Double> deltaValues = new ArrayList<Double>();
+			HashMap<Double, Double> rank = new HashMap<Double, Double>();
+
 			for (E c : CL) {
 				Double deltaCost = ObjFunction.evaluateInsertionCost(c, incumbentSol);
 				if (deltaCost <= minCost + alpha * (maxCost - minCost)) {
 					RCL.add(c);
-					if(cumSum.size() == 0) cumSum.add(biasFunction(deltaCost));
-					else cumSum.add(cumSum.get(cumSum.size()-1)+biasFunction(deltaCost));
+					deltaValues.add(deltaCost);
 				}
+			}
+			
+			ArrayList<Double> sortedDeltaValues = new ArrayList<Double>(deltaValues);
+			sortedDeltaValues.sort(null);
+
+			for (int i = 0; i < sortedDeltaValues.size(); i++)
+			{
+				if (!rank.containsKey(sortedDeltaValues.get(i)))
+					rank.put(sortedDeltaValues.get(i), i + 1.0);
+			}
+			
+			for (int i = 0; i < RCL.size(); i++)
+			{
+				if(cumSum.size() == 0) cumSum.add(biasFunction(rank.get(deltaValues.get(i))));
+				else cumSum.add(cumSum.get(cumSum.size()-1)+biasFunction(rank.get(deltaValues.get(i))));
 			}
 			
 			if (RCL.size() == 0)
 				break;
 			
-			/* Choose a candidate randomly from the RCL */
+			/* Choose a candidate randomly from the RCL considering weights */
 			Double rndIndex = cumSum.get(cumSum.size()-1)*rng.nextDouble();			
 			int id = 0;
 			while(id < cumSum.size()) {
-				if(cumSum.get(id) <= rndIndex) break;
+				if(cumSum.get(id) >= rndIndex) break;
 				id++;
 			}
 			E inCand = RCL.get(id);
