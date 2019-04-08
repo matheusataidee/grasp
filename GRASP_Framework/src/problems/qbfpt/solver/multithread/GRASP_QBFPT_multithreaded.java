@@ -32,8 +32,8 @@ public class GRASP_QBFPT_multithreaded  extends GRASP_QBFPT implements Runnable{
 	public static void main(String args[]) throws IOException {
 		String instances[] = {"instances/qbf020","instances/qbf040","instances/qbf060","instances/qbf080","instances/qbf100","instances/qbf200","instances/qbf400"};
 		GRASP_QBFPT_multithreaded.verbose = false;
-		int maxIter = 50000;
-		for(int i = 4;i<5;i++) {
+		int maxIter = 30 * 60 * 1000; // 30 min
+		for(int i = 0;i<7;i++) {
 			System.out.println("Instancia: "+instances[i]);
 			
 			GRASP_QBFPT_multithreaded graspPadrao = new GRASP_QBFPT_multithreaded(0.05, maxIter, instances[i], true, false, 0, 0);
