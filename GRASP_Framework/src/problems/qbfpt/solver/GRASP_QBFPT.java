@@ -206,6 +206,12 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 		System.out.println("Time = "+(double)totalTime/(double)1000+" seg");
 
 	}
+
+	@Override
+	public Double biasFunction(Double value) {
+		// TODO Auto-generated method stub
+		return (double) 1;
+	}
 }
 
 

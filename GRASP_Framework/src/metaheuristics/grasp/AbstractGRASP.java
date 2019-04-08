@@ -3,8 +3,8 @@
  */
 package metaheuristics.grasp;
 
-import java.io.Console;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 
 import problems.Evaluator;
@@ -25,7 +25,8 @@ public abstract class AbstractGRASP<E> {
 	 * screen
 	 */
 	public static boolean verbose = true;
-
+	public int biasType = 0;
+	public int biasExponent = 0;
 	/**
 	 * a random number generator
 	 */
@@ -77,7 +78,6 @@ public abstract class AbstractGRASP<E> {
 	protected ArrayList<E> RCL;
 
 	protected boolean pop = false;
-
 	/**
 	 * Creates the Candidate List, which is an ArrayList of candidate elements
 	 * that can enter a solution.
@@ -138,6 +138,11 @@ public abstract class AbstractGRASP<E> {
 		this.pop = pop;
 	}
 	
+	public Double biasFunction(Double value) {
+		if(this.biasType == 1) return Math.pow(Math.E,value);
+		return Math.pow(value, this.biasExponent);
+	}
+	
 	/**
 	 * The GRASP constructive heuristic, which is responsible for building a
 	 * feasible solution by selecting in a greedy-random fashion, candidate
@@ -145,6 +150,7 @@ public abstract class AbstractGRASP<E> {
 	 * 
 	 * @return A feasible solution to the problem being minimized.
 	 */
+	
 	public Solution<E> constructiveHeuristic() {
 
 		CL = makeCL();
@@ -191,10 +197,13 @@ public abstract class AbstractGRASP<E> {
 			 * Among all candidates, insert into the RCL those with the highest
 			 * performance using parameter alpha as threshold.
 			 */
+			ArrayList<Double> cumSum = new ArrayList<Double>();
 			for (E c : CL) {
 				Double deltaCost = ObjFunction.evaluateInsertionCost(c, incumbentSol);
 				if (deltaCost <= minCost + alpha * (maxCost - minCost)) {
 					RCL.add(c);
+					if(cumSum.size() == 0) cumSum.add(biasFunction(deltaCost));
+					else cumSum.add(cumSum.get(cumSum.size()-1)+biasFunction(deltaCost));
 				}
 			}
 			
@@ -202,8 +211,8 @@ public abstract class AbstractGRASP<E> {
 				break;
 			
 			/* Choose a candidate randomly from the RCL */
-			int rndIndex = rng.nextInt(RCL.size());
-			E inCand = RCL.get(rndIndex);
+			int rndIndex = rng.nextInt(cumSum.size());			
+			E inCand = RCL.get(Collections.binarySearch(cumSum,rndIndex,Collections.reverseOrder()));
 			
 			CL.remove(inCand);
 			incumbentSol.add(inCand);
