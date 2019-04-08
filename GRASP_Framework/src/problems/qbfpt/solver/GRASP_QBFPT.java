@@ -207,11 +207,6 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 
 	}
 
-	@Override
-	public Double biasFunction(Double value) {
-		// TODO Auto-generated method stub
-		return (double) 1;
-	}
 }
 
 
