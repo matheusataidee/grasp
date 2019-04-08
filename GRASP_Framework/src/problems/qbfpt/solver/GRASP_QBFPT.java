@@ -200,7 +200,7 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 	public static void main(String[] args) throws IOException {
 
 		long startTime = System.currentTimeMillis();
-		GRASP_QBFPT grasp = new GRASP_QBFPT(0.05, 100, "instances/qbf100", false, false, 0, -0.5);
+		GRASP_QBFPT grasp = new GRASP_QBFPT(0.05, 100, "instances/qbf100", true, false, 0, 0);
 		Solution<Integer> bestSol = grasp.solve();
 		System.out.println("maxVal = " + bestSol);
 		long endTime   = System.currentTimeMillis();
