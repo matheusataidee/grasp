@@ -212,7 +212,12 @@ public abstract class AbstractGRASP<E> {
 			
 			/* Choose a candidate randomly from the RCL */
 			Double rndIndex = cumSum.get(cumSum.size()-1)*rng.nextDouble();			
-			E inCand = RCL.get(Collections.binarySearch(cumSum,rndIndex,Collections.reverseOrder()));
+			int id = 0;
+			while(id < cumSum.size()) {
+				if(cumSum.get(id) <= rndIndex) break;
+				id++;
+			}
+			E inCand = RCL.get(id);
 			
 			CL.remove(inCand);
 			incumbentSol.add(inCand);
